@@ -1,5 +1,5 @@
 const admin = require("./node_modules/firebase-admin");
-const serviceAccount = require("./service-key.json");
+const serviceAccount = require("../../private-keys/shirtpro-99536-firebase-adminsdk-ojop8-929a104507.json");
 
 const data = require("./data.json");
 

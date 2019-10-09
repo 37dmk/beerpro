@@ -195,7 +195,7 @@
                     android:layout_gravity="center_vertical"
                     android:layout_marginStart="8dp"
                     android:layout_weight="1"
-                    android:text="Kühlschrank" />
+                    android:text="@string/title_activity_fridge" />
 
 
                 <TextView

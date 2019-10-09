@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "340885620178",
+    "firebase_url": "https://shirtpro-99536.firebaseio.com",
+    "project_id": "shirtpro-99536",
+    "storage_bucket": "shirtpro-99536.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:340885620178:android:30f2394ed2c052760b340b",
+        "android_client_info": {
+          "package_name": "ch.beerpro"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "340885620178-bt27rnaf6nmbcdoqern809nr5cr2nc3t.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "ch.beerpro",
+            "certificate_hash": "ecddf1c76eb45e7bd0df2af02b9151f09779a712"
+          }
+        },
+        {
+          "client_id": "340885620178-iiq6fc8fou1oqg9akdgkib6rceanuncv.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA6jbUuj7VrIn1tMY0P0GcroE8k-zHENqs"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "340885620178-iiq6fc8fou1oqg9akdgkib6rceanuncv.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
