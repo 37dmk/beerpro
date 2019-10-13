@@ -9,6 +9,7 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.RatingBar;
 import android.widget.TextView;
+import android.widget.Toast;
 import android.widget.ToggleButton;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -41,6 +42,7 @@ public class DetailsActivity extends AppCompatActivity implements OnRatingLikedL
 
     public static final String ITEM_ID = "item_id";
     private static final String TAG = "DetailsActivity";
+
     @BindView(R.id.toolbar)
     Toolbar toolbar;
 
@@ -127,6 +129,19 @@ public class DetailsActivity extends AppCompatActivity implements OnRatingLikedL
         dialog.setContentView(view);
         dialog.show();
     }
+
+
+    /* this part of code seems to act strange */
+
+    /*
+    @OnClick(R.id.addToFridge)
+    public void addToMyFridge(){
+        Toast toast = Toast.makeText(this, "add to fridge", Toast.LENGTH_SHORT);
+        toast.show();
+        // model.addItemToFridge(CreateRatingActivity.ITEM);
+    }
+
+     */
 
     private void updateBeer(Beer item) {
         name.setText(item.getName());
