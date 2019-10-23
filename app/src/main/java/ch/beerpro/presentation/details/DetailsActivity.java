@@ -206,8 +206,10 @@ public class DetailsActivity extends AppCompatActivity implements OnRatingLikedL
             public void onClick(View v)
             {
                 // open dialog if you got the time to implement it
-                Toast.makeText( getApplicationContext(),"item added.", Toast.LENGTH_SHORT).show();
-                model.addItemToFridge(model.getBeer().getValue().getId());
+                model.addItemToFridge(model.getBeer().getValue().getId()).addOnCompleteListener((task)->{
+                    String message = "Currently you have: " + Integer.toString(task.getResult()) + " in your fridge.";
+                    Toast.makeText( getApplicationContext(),message, Toast.LENGTH_SHORT).show();
+                });
             }
         });
 

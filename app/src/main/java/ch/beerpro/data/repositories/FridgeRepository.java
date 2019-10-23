@@ -33,7 +33,6 @@ import static com.firebase.ui.auth.AuthUI.getApplicationContext;
 
 public class FridgeRepository {
 
-
     private static LiveData<List<FridgeEntry>> getFridgeEntriesByUser(String userId) {
         return new FirestoreQueryLiveDataArray<>(FirebaseFirestore.getInstance().collection(FridgeEntry.COLLECTION)
                 .orderBy(FridgeEntry.FIELD_ADDED_AT, Query.Direction.DESCENDING).whereEqualTo(FridgeEntry.FIELD_USER_ID, userId),
@@ -48,21 +47,29 @@ public class FridgeRepository {
         return new FirestoreQueryLiveData<>(document, FridgeEntry.class);
     }
 
-    public Task<Void> addUserFridgeItem(String userId, String itemId, int amount) {
-
+    public Task<Integer> addUserFridgeItem(String userId, String itemId, int amount) {
         // add amount of items to fridge
         FirebaseFirestore db = FirebaseFirestore.getInstance();
         String fridgeEntryId = FridgeEntry.generateId(userId, itemId);
         DocumentReference fridgeEntryQuery = db.collection(FridgeEntry.COLLECTION).document(fridgeEntryId);
-        return fridgeEntryQuery.get().continueWithTask(task ->{
+
+        return fridgeEntryQuery.get().continueWithTask(task -> {
             if (task.isSuccessful() && task.getResult().exists()) {
                 long current = ((long) task.getResult().getData().get("amount"));
-                if(current >= Integer.MAX_VALUE)
+                if (current >= Integer.MAX_VALUE)
                     throw task.getException();
                 current += amount;
-                return fridgeEntryQuery.set(new FridgeEntry(userId, itemId, (int)current, new Date()));
+                final long returnValue = current;
+                return fridgeEntryQuery.set(new FridgeEntry(userId, itemId, (int) current, new Date()))
+                        .continueWith((taskTwo)->{
+                            return (int) returnValue;
+                        });
+
             } else if (task.isSuccessful()) {
-                return fridgeEntryQuery.set(new FridgeEntry(userId, itemId, amount, new Date()));
+                return fridgeEntryQuery.set(new FridgeEntry(userId, itemId, amount, new Date()))
+                        .continueWith((taskTwo)->{
+                            return (int) 1;
+                        });
             } else {
                 throw task.getException();
             }
@@ -73,18 +80,18 @@ public class FridgeRepository {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
         String fridgeEntryId = FridgeEntry.generateId(userId, itemId);
         DocumentReference fridgeEntryQuery = db.collection(FridgeEntry.COLLECTION).document(fridgeEntryId);
-        return fridgeEntryQuery.get().continueWithTask(task ->{
+        return fridgeEntryQuery.get().continueWithTask(task -> {
             if (task.isSuccessful() && task.getResult().exists()) {
                 long current = ((long) task.getResult().getData().get("amount"));
-                if(current < 0)
+                if (current < 0)
                     throw task.getException();
-                if(current < 2){
+                if (current < 2) {
                     // remove item from list
                     return fridgeEntryQuery.delete();
                 }
-                current --;
-                return fridgeEntryQuery.set(new FridgeEntry(userId, itemId, (int)current, new Date()));
-            }  else {
+                current--;
+                return fridgeEntryQuery.set(new FridgeEntry(userId, itemId, (int) current, new Date()));
+            } else {
                 throw task.getException();
             }
         });
@@ -110,10 +117,17 @@ public class FridgeRepository {
 
 
     public LiveData<FridgeEntry> getMyFridgeEntry(LiveData<String> currentUserId, LiveData<Beer> beer) {
-
-
         return switchMap(combineLatest(currentUserId, beer), FridgeRepository::getUserFridgeListFor);
     }
 
-
+    /*
+    public int getAmountOfBeerId(){
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        String fridgeEntryId = FridgeEntry.generateId(userId, itemId);
+        DocumentReference fridgeEntryQuery = db.collection(FridgeEntry.COLLECTION).document(fridgeEntryId);
+        long amount = await (long) fridgeEntryQuery.get().continueWithTask(task -> {
+                long current = ((long) task.getResult().getData().get("amount"));
+            }
+    }
+     */
 }
