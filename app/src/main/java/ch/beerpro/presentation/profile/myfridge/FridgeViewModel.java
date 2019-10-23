@@ -31,12 +31,12 @@ public class FridgeViewModel extends ViewModel implements CurrentUser {
         currentUserId.setValue(getCurrentUser().getUid());
     }
 
-    public LiveData<List<Pair<FridgeEntry, Beer>>> getMyWishlistWithBeers() {
+    public LiveData<List<Pair<FridgeEntry, Beer>>> getFridgeWithBeers() {
         return fridgeRepository.getMyFridgeWithBeers(currentUserId, beersRepository.getAllBeers());
     }
 
-    public Task<Void> toggleItemInWishlist(String itemId) {
-        return fridgeRepository.addUserFridgeItem(getCurrentUser().getUid(), itemId, 1);
+    public Task<Void> drinkBeer(String itemId) {
+        return fridgeRepository.drinkBeerFromFridge(getCurrentUser().getUid(), itemId);
     }
 
 }

@@ -21,7 +21,6 @@ import butterknife.ButterKnife;
 import ch.beerpro.R;
 import ch.beerpro.domain.models.Beer;
 import ch.beerpro.domain.models.FridgeEntry;
-import ch.beerpro.domain.models.Wish;
 import ch.beerpro.presentation.details.DetailsActivity;
 
 public class FridgeActivity extends AppCompatActivity implements OnFridgeItemInteractionListener {
@@ -49,7 +48,7 @@ public class FridgeActivity extends AppCompatActivity implements OnFridgeItemInt
 
 
         model = ViewModelProviders.of(this).get(FridgeViewModel.class);
-        model.getMyWishlistWithBeers().observe(this, this::updateWishlist);
+        model.getFridgeWithBeers().observe(this, this::updateFridge);
 
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);
         recyclerView.setLayoutManager(layoutManager);
@@ -60,7 +59,7 @@ public class FridgeActivity extends AppCompatActivity implements OnFridgeItemInt
 
     }
 
-    private void updateWishlist(List<Pair<FridgeEntry, Beer>> entries) {
+    private void updateFridge(List<Pair<FridgeEntry, Beer>> entries) {
         adapter.submitList(entries);
         if (entries.isEmpty()) {
             emptyView.setVisibility(View.VISIBLE);
@@ -92,7 +91,7 @@ public class FridgeActivity extends AppCompatActivity implements OnFridgeItemInt
     }
 
     @Override
-    public void onWishClickedListener(Beer beer) {
-        model.toggleItemInWishlist(beer.getId());
+    public void onDrinkClickedListener(Beer beer) {
+        model.drinkBeer(beer.getId());
     }
 }

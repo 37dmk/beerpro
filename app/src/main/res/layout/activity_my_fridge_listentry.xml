@@ -26,6 +26,7 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent" />
 
+            <!--
             <TextView
                 android:id="@+id/textView4"
                 android:layout_width="wrap_content"
@@ -49,35 +50,47 @@
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/textView4" />
+                -->
+
+            <TextView
+                android:id="@+id/amountLabel"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="16dp"
+                android:text="Anzahl"
+                android:textSize="12sp"
+                android:textStyle="bold"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
 
             <TextView
                 android:id="@+id/amount"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="200dp"
-                android:layout_marginBottom="8dp"
+                android:layout_marginStart="80dp"
+                android:layout_marginBottom="0dp"
                 android:text="Amount"
                 android:textSize="12sp"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintBottom_toBottomOf="@id/amountLabel"
+                app:layout_constraintStart_toStartOf="@id/amountLabel"
                 app:layout_constraintTop_toBottomOf="@+id/textView4" />
 
-            <!--
+
             <Button
-                android:id="@+id/removeFromWishlist"
+                android:id="@+id/drink"
                 style="?android:attr/borderlessButtonStyle"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:drawableTop="@drawable/ic_bookmark_brown_24dp"
+                android:drawableTop="@drawable/ic_drinkicon_brown_24dp"
                 android:drawableTint="@color/colorPrimary"
-                android:text="Entfernen"
+                android:text="Trinken"
                 android:textColor="@android:color/darker_gray"
                 android:textSize="10sp"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
-                -->
 
 
         </androidx.constraintlayout.widget.ConstraintLayout>

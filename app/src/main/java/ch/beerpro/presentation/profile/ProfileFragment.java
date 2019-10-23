@@ -115,8 +115,6 @@ public class ProfileFragment extends Fragment {
 
     @OnClick({R.id.myFridge})
     public void handleMyFridgeClick(View view) {
-        Toast toast = Toast.makeText(getActivity(), "Activity got launched", Toast.LENGTH_SHORT);
-        toast.show();
         Intent intent = new Intent(getActivity(), FridgeActivity.class);
         startActivity(intent);
     }
@@ -130,7 +128,7 @@ public class ProfileFragment extends Fragment {
     }
 
     private void updateFridgeCount(List<FridgeEntry> entries) {
-        myWishlistCount.setText(String.valueOf(entries.size()));
+        myFridgeCount.setText(String.valueOf(entries.size()));
     }
 
 }

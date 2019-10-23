@@ -1,23 +1,32 @@
 package ch.beerpro.presentation;
 
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.viewpager.widget.ViewPager;
 
 import com.firebase.ui.auth.AuthUI;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.tabs.TabLayout;
+import com.google.firebase.dynamiclinks.FirebaseDynamicLinks;
+import com.google.firebase.dynamiclinks.PendingDynamicLinkData;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import ch.beerpro.R;
+import ch.beerpro.presentation.details.DetailsActivity;
 import ch.beerpro.presentation.explore.BeerCategoriesFragment;
 import ch.beerpro.presentation.explore.BeerManufacturersFragment;
 import ch.beerpro.presentation.explore.ExploreFragment;
@@ -50,6 +59,7 @@ public class MainActivity extends AppCompatActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
+        final String TAG = "DynamicLink";
 
         /*
          * The following ceremony is need to have the app logo set as the home button.
@@ -67,6 +77,33 @@ public class MainActivity extends AppCompatActivity
         FloatingActionButton fab = findViewById(R.id.fab);
         fab.setOnClickListener(view -> Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
                 .setAction("Action", null).show());
+
+        /*
+            Following code will initiate dynamic links
+         */
+        FirebaseDynamicLinks.getInstance()
+                .getDynamicLink(getIntent())
+                .addOnSuccessListener(this, new OnSuccessListener<PendingDynamicLinkData>() {
+                    @Override
+                    public void onSuccess(PendingDynamicLinkData pendingDynamicLinkData) {
+                        // Get deep link from result (may be null if no link is found)
+                        Uri deepLink = null;
+                        if (pendingDynamicLinkData != null) {
+                            deepLink = pendingDynamicLinkData.getLink();
+                            String beerId = deepLink.getQueryParameter("beerid");
+
+                            Intent intent = new Intent(MainActivity.this, DetailsActivity.class);
+                            intent.putExtra(DetailsActivity.ITEM_ID, beerId);
+                            startActivity(intent);
+                        }
+                    }
+                })
+                .addOnFailureListener(this, new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        Log.e(TAG, "getDynamicLink:onFailure", e);
+                    }
+                });
     }
 
     private void setupViewPager(ViewPager viewPager, TabLayout tabLayout) {
@@ -139,4 +176,11 @@ public class MainActivity extends AppCompatActivity
     public void onBeerManufacturerSelected(String name) {
         // TODO implement
     }
+
+    /*
+    public void showBeer(Uri beerUri){
+        String toaststr = "Got the uri: " + beerUri;
+        Toast.makeText( getApplicationContext(),toaststr, Toast.LENGTH_SHORT).show();
+    }
+     */
 }

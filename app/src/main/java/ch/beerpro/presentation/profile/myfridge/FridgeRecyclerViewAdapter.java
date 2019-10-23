@@ -75,13 +75,11 @@ public class FridgeRecyclerViewAdapter extends ListAdapter<Pair<FridgeEntry, Bee
         @BindView(R.id.numRatings)
         TextView numRatings;
 
-        @BindView(R.id.addedAt)
-        TextView addedAt;
+        @BindView(R.id.amount)
+        TextView amount;
 
-        /*
-        @BindView(R.id.removeFromWishlist)
-        Button remove;
-        */
+        @BindView(R.id.drink)
+        Button drink;
 
         ViewHolder(View view) {
             super(view);
@@ -100,10 +98,12 @@ public class FridgeRecyclerViewAdapter extends ListAdapter<Pair<FridgeEntry, Bee
             numRatings.setText(itemView.getResources().getString(R.string.fmt_num_ratings, item.getNumRatings()));
             itemView.setOnClickListener(v -> listener.onMoreClickedListener(photo, item));
 
-            String formattedDate =
-                    DateFormat.getDateTimeInstance(DateFormat.FULL, DateFormat.SHORT).format(entry.getAddedAt());
-            addedAt.setText(formattedDate);
-            // remove.setOnClickListener(v -> listener.onWishClickedListener(item));
+            // String formattedDate = DateFormat.getDateTimeInstance(DateFormat.FULL, DateFormat.SHORT).format(entry.getAddedAt());
+            // addedAt.setText(formattedDate);
+
+            String amountValue = Integer.toString(entry.getAmount());
+            amount.setText(amountValue);
+            drink.setOnClickListener(v -> listener.onDrinkClickedListener(item));
         }
 
     }

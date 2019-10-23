@@ -55,10 +55,6 @@ public class DetailsViewModel extends ViewModel implements CurrentUser {
         return wish;
     }
 
-    public LiveData<FridgeEntry> getFridgeEntry() {
-        return fridge;
-    }
-
     public LiveData<List<Rating>> getRatings() {
         return ratings;
     }

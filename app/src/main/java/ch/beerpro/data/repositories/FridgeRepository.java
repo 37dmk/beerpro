@@ -1,11 +1,15 @@
 package ch.beerpro.data.repositories;
 
+import android.util.Log;
+import android.util.LogPrinter;
 import android.util.Pair;
+import android.widget.Toast;
 
 import androidx.lifecycle.LiveData;
 
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
 
@@ -20,10 +24,12 @@ import ch.beerpro.domain.models.FridgeEntry;
 import ch.beerpro.domain.models.Wish;
 import ch.beerpro.domain.utils.FirestoreQueryLiveData;
 import ch.beerpro.domain.utils.FirestoreQueryLiveDataArray;
+import ch.beerpro.presentation.details.DetailsActivity;
 
 import static androidx.lifecycle.Transformations.map;
 import static androidx.lifecycle.Transformations.switchMap;
 import static ch.beerpro.domain.utils.LiveDataExtensions.combineLatest;
+import static com.firebase.ui.auth.AuthUI.getApplicationContext;
 
 public class FridgeRepository {
 
@@ -44,15 +50,17 @@ public class FridgeRepository {
 
     public Task<Void> addUserFridgeItem(String userId, String itemId, int amount) {
 
+        // add amount of items to fridge
         FirebaseFirestore db = FirebaseFirestore.getInstance();
-
         String fridgeEntryId = FridgeEntry.generateId(userId, itemId);
-
         DocumentReference fridgeEntryQuery = db.collection(FridgeEntry.COLLECTION).document(fridgeEntryId);
-
-        return fridgeEntryQuery.get().continueWithTask(task -> {
+        return fridgeEntryQuery.get().continueWithTask(task ->{
             if (task.isSuccessful() && task.getResult().exists()) {
-                return fridgeEntryQuery.delete();
+                long current = ((long) task.getResult().getData().get("amount"));
+                if(current >= Integer.MAX_VALUE)
+                    throw task.getException();
+                current += amount;
+                return fridgeEntryQuery.set(new FridgeEntry(userId, itemId, (int)current, new Date()));
             } else if (task.isSuccessful()) {
                 return fridgeEntryQuery.set(new FridgeEntry(userId, itemId, amount, new Date()));
             } else {
@@ -61,8 +69,28 @@ public class FridgeRepository {
         });
     }
 
-    public LiveData<List<Pair<FridgeEntry, Beer>>> getMyFridgeWithBeers(LiveData<String> currentUserId,
-                                                                   LiveData<List<Beer>> allBeers) {
+    public Task<Void> drinkBeerFromFridge(String userId, String itemId) {
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        String fridgeEntryId = FridgeEntry.generateId(userId, itemId);
+        DocumentReference fridgeEntryQuery = db.collection(FridgeEntry.COLLECTION).document(fridgeEntryId);
+        return fridgeEntryQuery.get().continueWithTask(task ->{
+            if (task.isSuccessful() && task.getResult().exists()) {
+                long current = ((long) task.getResult().getData().get("amount"));
+                if(current < 0)
+                    throw task.getException();
+                if(current < 2){
+                    // remove item from list
+                    return fridgeEntryQuery.delete();
+                }
+                current --;
+                return fridgeEntryQuery.set(new FridgeEntry(userId, itemId, (int)current, new Date()));
+            }  else {
+                throw task.getException();
+            }
+        });
+    }
+
+    public LiveData<List<Pair<FridgeEntry, Beer>>> getMyFridgeWithBeers(LiveData<String> currentUserId, LiveData<List<Beer>> allBeers) {
         return map(combineLatest(getMyFridgelist(currentUserId), map(allBeers, Entity::entitiesById)), input -> {
             List<FridgeEntry> entries = input.first;
             HashMap<String, Beer> beersById = input.second;

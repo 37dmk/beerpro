@@ -3,9 +3,11 @@ package ch.beerpro.presentation.details;
 import android.app.ActivityOptions;
 import android.content.Intent;
 import android.graphics.Color;
+import android.net.Uri;
 import android.os.Bundle;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.RatingBar;
 import android.widget.TextView;
@@ -22,6 +24,9 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.request.RequestOptions;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
+import com.google.android.material.snackbar.Snackbar;
+import com.google.firebase.dynamiclinks.DynamicLink;
+import com.google.firebase.dynamiclinks.FirebaseDynamicLinks;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -32,6 +37,7 @@ import butterknife.OnClick;
 import ch.beerpro.GlideApp;
 import ch.beerpro.R;
 import ch.beerpro.domain.models.Beer;
+import ch.beerpro.domain.models.FridgeEntry;
 import ch.beerpro.domain.models.Rating;
 import ch.beerpro.domain.models.Wish;
 import ch.beerpro.presentation.details.createrating.CreateRatingActivity;
@@ -67,6 +73,10 @@ public class DetailsActivity extends AppCompatActivity implements OnRatingLikedL
     @BindView(R.id.wishlist)
     ToggleButton wishlist;
 
+    // bind the shareMyBeerBtn
+    @BindView(R.id.shareMyBeerBtn)
+    Button shareMyBeerBtn;
+
     @BindView(R.id.manufacturer)
     TextView manufacturer;
 
@@ -86,16 +96,18 @@ public class DetailsActivity extends AppCompatActivity implements OnRatingLikedL
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+
         setContentView(R.layout.activity_details);
         ButterKnife.bind(this);
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-        getWindow().getDecorView()
-                .setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_STABLE | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN);
+        getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_STABLE | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN);
         toolbar.setTitleTextColor(Color.alpha(0));
 
         String beerId = getIntent().getExtras().getString(ITEM_ID);
+        beerId = handleIntent(beerId);
 
         model = ViewModelProviders.of(this).get(DetailsViewModel.class);
         model.setBeerId(beerId);
@@ -112,6 +124,66 @@ public class DetailsActivity extends AppCompatActivity implements OnRatingLikedL
 
         recyclerView.setAdapter(adapter);
         addRatingBar.setOnRatingBarChangeListener(this::addNewRating);
+
+
+        shareMyBeerBtn.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                // open dialog if you got the time to implement it
+                /*
+                String toaststr = "item " + beerId + " is shared.";
+                Toast.makeText(getApplicationContext(), toaststr, Toast.LENGTH_SHORT).show();
+                Intent shareBeer = new Intent(Intent.ACTION_SEND);
+                shareBeer.setType("text/plain");
+                shareBeer.putExtra(Intent.EXTRA_SUBJECT, "check this beer");
+                String appLink = "";
+                shareBeer.putExtra(Intent.EXTRA_TEXT, "beer name: " + appLink);
+                 */
+                Toast.makeText( getApplicationContext(),"item shared.", Toast.LENGTH_SHORT).show();
+                String beerId = model.getBeer().getValue().getId();
+                Uri.Builder builder = new Uri.Builder();
+                builder.scheme("https")
+                        .authority("shirtpro.page.link")
+                        .appendPath("beershare")
+                        .appendQueryParameter("beerid", beerId);
+
+                DynamicLink dynamicLink = FirebaseDynamicLinks.getInstance().createDynamicLink()
+                        .setLink(builder.build())
+                        .setDynamicLinkDomain("shirtpro.page.link")
+                        // Open links with this app on Android
+                        .setAndroidParameters(new DynamicLink.AndroidParameters.Builder().build())
+                        .buildDynamicLink();
+                Uri dynamicLinkUri = dynamicLink.getUri();
+
+                Intent sendIntent = new Intent();
+                sendIntent.setAction(Intent.ACTION_SEND);
+                sendIntent.putExtra(Intent.EXTRA_SUBJECT, "Beer Pro");
+                sendIntent.putExtra(Intent.EXTRA_TEXT, dynamicLinkUri.toString());
+                sendIntent.setType("text/plain");
+                startActivity(Intent.createChooser(sendIntent, "Share app via"));
+            }
+        });
+
+
+    }
+
+    // this is the way to do it with app links
+    @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+        setIntent(intent);
+        String beerId = getIntent().getExtras().getString(ITEM_ID);
+        handleIntent(beerId);
+    }
+
+    private String handleIntent(String beerId) {
+        // ATTENTION: This was auto-generated to handle app links.
+        Intent appLinkIntent = getIntent();
+        String appLinkAction = appLinkIntent.getAction();
+        Uri appLinkData = appLinkIntent.getData();
+        if(appLinkData != null){
+            beerId = appLinkData.getLastPathSegment();
+        }
+        return beerId;
     }
 
     private void addNewRating(RatingBar ratingBar, float v, boolean b) {
@@ -127,29 +199,27 @@ public class DetailsActivity extends AppCompatActivity implements OnRatingLikedL
         View view = getLayoutInflater().inflate(R.layout.single_bottom_sheet_dialog, null);
         BottomSheetDialog dialog = new BottomSheetDialog(this);
         dialog.setContentView(view);
+
+        // this is where i add the action to the fridge button (only exist within this context!)
+        Button btnfridge = dialog.findViewById(R.id.addToFridge);
+        btnfridge.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v)
+            {
+                // open dialog if you got the time to implement it
+                Toast.makeText( getApplicationContext(),"item added.", Toast.LENGTH_SHORT).show();
+                model.addItemToFridge(model.getBeer().getValue().getId());
+            }
+        });
+
         dialog.show();
     }
-
-
-    /* this part of code seems to act strange */
-
-    /*
-    @OnClick(R.id.addToFridge)
-    public void addToMyFridge(){
-        Toast toast = Toast.makeText(this, "add to fridge", Toast.LENGTH_SHORT);
-        toast.show();
-        // model.addItemToFridge(CreateRatingActivity.ITEM);
-    }
-
-     */
 
     private void updateBeer(Beer item) {
         name.setText(item.getName());
         manufacturer.setText(item.getManufacturer());
         category.setText(item.getCategory());
         name.setText(item.getName());
-        GlideApp.with(this).load(item.getPhoto()).apply(new RequestOptions().override(120, 160).centerInside())
-                .into(photo);
+        GlideApp.with(this).load(item.getPhoto()).apply(new RequestOptions().override(120, 160).centerInside()).into(photo);
         ratingBar.setNumStars(5);
         ratingBar.setRating(item.getAvgRating());
         avgRating.setText(getResources().getString(R.string.fmt_avg_rating, item.getAvgRating()));
@@ -188,6 +258,36 @@ public class DetailsActivity extends AppCompatActivity implements OnRatingLikedL
             wishlist.setChecked(false);
         }
     }
+
+    /*
+    @OnClick(R.id.shareMyBeerBtn)
+    private void shareBeerOnclick( FridgeEntry entry ) {
+        Toast.makeText( getApplicationContext(),"item shared.", Toast.LENGTH_SHORT).show();
+        // model.addItemToFridge(model.getBeer().getValue().getId());
+        String beerId = model.getBeer().getValue().getId();
+        Uri.Builder builder = new Uri.Builder();
+        builder.scheme("https")
+                .authority("shirtpro.page.link")
+                .appendPath("beershare")
+                .appendQueryParameter("beerid", beerId);
+
+        DynamicLink dynamicLink = FirebaseDynamicLinks.getInstance().createDynamicLink()
+                .setLink(builder.build())
+                .setDynamicLinkDomain("shirtpro.page.link")
+                // Open links with this app on Android
+                .setAndroidParameters(new DynamicLink.AndroidParameters.Builder().build())
+                .buildDynamicLink();
+        Uri dynamicLinkUri = dynamicLink.getUri();
+
+        Intent sendIntent = new Intent();
+        sendIntent.setAction(Intent.ACTION_SEND);
+        sendIntent.putExtra(Intent.EXTRA_SUBJECT, "Beer Pro");
+        sendIntent.putExtra(Intent.EXTRA_TEXT, dynamicLinkUri.toString());
+        sendIntent.setType("text/plain");
+        startActivity(Intent.createChooser(sendIntent, "Share app via"));
+    }
+
+     */
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {

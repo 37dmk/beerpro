@@ -122,6 +122,7 @@ public class MyBeersRecyclerViewAdapter extends ListAdapter<MyBeer, MyBeersRecyc
                     DateFormat.getDateTimeInstance(DateFormat.FULL, DateFormat.SHORT).format(entry.getDate());
             addedAt.setText(formattedDate);
 
+
             if (entry instanceof MyBeerFromWishlist) {
                 DrawableHelpers
                         .setDrawableTint(removeFromWishlist, itemView.getResources().getColor(R.color.colorPrimary));

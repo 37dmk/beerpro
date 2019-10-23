@@ -8,5 +8,5 @@ public interface OnFridgeItemInteractionListener {
 
     void onMoreClickedListener(ImageView photo, Beer beer);
 
-    void onWishClickedListener(Beer beer);
+    void onDrinkClickedListener(Beer beer);
 }

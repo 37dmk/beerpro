@@ -10,7 +10,7 @@ import java.util.Date;
 @IgnoreExtraProperties
 public class FridgeEntry implements Entity {
 
-    public static final String COLLECTION = "wishes";
+    public static final String COLLECTION = "fridge";
     public static final String FIELD_ID = "id";
     public static final String FIELD_USER_ID = "userId";
     public static final String FIELD_BEER_ID = "beerId";
