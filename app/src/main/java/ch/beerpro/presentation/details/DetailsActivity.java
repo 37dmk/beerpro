@@ -126,44 +126,6 @@ public class DetailsActivity extends AppCompatActivity implements OnRatingLikedL
         addRatingBar.setOnRatingBarChangeListener(this::addNewRating);
 
 
-        shareMyBeerBtn.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-                // open dialog if you got the time to implement it
-                /*
-                String toaststr = "item " + beerId + " is shared.";
-                Toast.makeText(getApplicationContext(), toaststr, Toast.LENGTH_SHORT).show();
-                Intent shareBeer = new Intent(Intent.ACTION_SEND);
-                shareBeer.setType("text/plain");
-                shareBeer.putExtra(Intent.EXTRA_SUBJECT, "check this beer");
-                String appLink = "";
-                shareBeer.putExtra(Intent.EXTRA_TEXT, "beer name: " + appLink);
-                 */
-                Toast.makeText( getApplicationContext(),"item shared.", Toast.LENGTH_SHORT).show();
-                String beerId = model.getBeer().getValue().getId();
-                Uri.Builder builder = new Uri.Builder();
-                builder.scheme("https")
-                        .authority("shirtpro.page.link")
-                        .appendPath("beershare")
-                        .appendQueryParameter("beerid", beerId);
-
-                DynamicLink dynamicLink = FirebaseDynamicLinks.getInstance().createDynamicLink()
-                        .setLink(builder.build())
-                        .setDynamicLinkDomain("shirtpro.page.link")
-                        // Open links with this app on Android
-                        .setAndroidParameters(new DynamicLink.AndroidParameters.Builder().build())
-                        .buildDynamicLink();
-                Uri dynamicLinkUri = dynamicLink.getUri();
-
-                Intent sendIntent = new Intent();
-                sendIntent.setAction(Intent.ACTION_SEND);
-                sendIntent.putExtra(Intent.EXTRA_SUBJECT, "Beer Pro");
-                sendIntent.putExtra(Intent.EXTRA_TEXT, dynamicLinkUri.toString());
-                sendIntent.setType("text/plain");
-                startActivity(Intent.createChooser(sendIntent, "Share app via"));
-            }
-        });
-
-
     }
 
     // this is the way to do it with app links
@@ -261,9 +223,10 @@ public class DetailsActivity extends AppCompatActivity implements OnRatingLikedL
         }
     }
 
-    /*
+
+    // this somehow works now, cause it takes not parameter and it's public !
     @OnClick(R.id.shareMyBeerBtn)
-    private void shareBeerOnclick( FridgeEntry entry ) {
+    public void shareBeerOnclick() {
         Toast.makeText( getApplicationContext(),"item shared.", Toast.LENGTH_SHORT).show();
         // model.addItemToFridge(model.getBeer().getValue().getId());
         String beerId = model.getBeer().getValue().getId();
@@ -288,8 +251,6 @@ public class DetailsActivity extends AppCompatActivity implements OnRatingLikedL
         sendIntent.setType("text/plain");
         startActivity(Intent.createChooser(sendIntent, "Share app via"));
     }
-
-     */
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
